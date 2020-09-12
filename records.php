@@ -35,7 +35,25 @@ function renderForm($first= '', $last= '', $error = '', $id = '')
 }
 if(isset($_GET['id'])){
   //editing existing record
-  renderForm(NULL, NULL, NULL, $_GET['id']);
+  if(is_numeric($_GET['id']) && $_GET['id']>0)
+  {
+    //query database 2:45
+	$id=$_GET['id'];
+	if($stmt =$mysqli->prepare ("SELECT * FROM players WHERE id=?")){
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$stmt->bind_result($id, $firstname, $lastname);
+		$stmt->fetch();
+		renderForm($firstname, $lastname, NULL, $id);
+		$stmt->close();
+	}else{
+		echo "ERROR: could not prepare SQL statement";
+	}
+  }
+  else{
+    header("Location: view.php");
+  }
+  //renderForm(NULL, NULL, NULL, $_GET['id']);
 }else{
   //create new record
   if(isset($_POST['submit'])){
