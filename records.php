@@ -34,6 +34,32 @@ function renderForm($first= '', $last= '', $error = '', $id = '')
 <?php
 }
 if(isset($_GET['id'])){
+	if(isset($_POST['submit'])){
+		if(is_numeric($_POST['id'])){
+			$id=$_POST['id'];
+			$firstname=htmlentities($_POST['firstname'], ENT_QUOTES);
+			$lastname=htmlentities($_POST['lastname'], ENT_QUOTES);
+			
+			if($firstname==''||$lastname==''){
+				$error='ERROR: Please fill in all required fields!';
+				renderForm($firstname, $lastname, $error, $id);
+			}else{
+				if($stmt=$mysqli->prepare("UPDATE players SET firstname=?, lastname=? WHERE id=?")){
+					$stmt->bind_param("ssi", $firstname, $lastname, $id);
+					$stmt->execute();
+					$stmt->close();
+					echo "works";
+				}else{
+					echo "ERROR: could not prepare SQL statement";
+				}
+				header("location: view.php");
+			}
+		}else{
+			echo 'ERROR!';
+		}
+	}else{
+		
+	
   //editing existing record
   if(is_numeric($_GET['id']) && $_GET['id']>0)
   {
@@ -52,7 +78,8 @@ if(isset($_GET['id'])){
   }
   else{
     header("Location: view.php");
-  }
+	}
+	}
   //renderForm(NULL, NULL, NULL, $_GET['id']);
 }else{
   //create new record
@@ -74,6 +101,7 @@ if(isset($_GET['id'])){
       }
       header("Location: view.php");
     }
+	
 
   }else{
     
